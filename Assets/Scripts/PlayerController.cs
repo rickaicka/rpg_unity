@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float Speed = 5f;
+    public float Speed = 3f;
 
     public float RotSpeed = 40f;
 
@@ -17,6 +18,12 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
 
     private Animator animator;
+
+    private List<Transform> EnemiesList = new List<Transform>();
+
+    public float ColliderRadius;
+
+    private bool IsReady;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,15 +57,21 @@ public class PlayerController : MonoBehaviour
                     animator.SetInteger("transition", 1);
                     MoveDirection = Vector3.back * Speed;
                     MoveDirection = transform.TransformDirection(MoveDirection);
+                    
+                    //transform.Rotate(Vector3.up * Time.deltaTime * RotSpeed);
+                    
+                    
+                    // Rotation += RotSpeed * Time.deltaTime;
+                    // transform.rotation = Quaternion.Euler(0, Mathf.LerpAngle(transform.rotation.eulerAngles.y, RotSpeed, Rotation), 0);
                 }
                 if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
                 {
-                    InitiateTransitions(0);
+                    InitiateTransitions();
                 }
             }
             else
             {
-                InitiateTransitions(0);
+                InitiateTransitions();
                 StartCoroutine(Attack());
             }
         }
@@ -77,7 +90,7 @@ public class PlayerController : MonoBehaviour
             {
                 if(animator.GetBool("isWalking"))
                 {
-                    InitiateTransitions(1);
+                    InitiateTransitions();
                 }
                 
                 if(!animator.GetBool("isWalking"))
@@ -88,19 +101,51 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void InitiateTransitions(int transition)
+    private void InitiateTransitions()
     {
         animator.SetBool("isWalking", false);
         animator.SetBool("isAttacking", false);
-        animator.SetInteger("transition", transition);
+        animator.SetInteger("transition", 0);
         MoveDirection = Vector3.zero;
     }
-    
+
+    private void GetEnemiesRange()
+    {
+        EnemiesList.Clear();
+        foreach (Collider collider in Physics.OverlapSphere((transform.position + transform.forward * ColliderRadius), ColliderRadius))
+        {
+            if (collider.gameObject.CompareTag("Enemy"))
+            {
+                EnemiesList.Add(collider.transform);
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+       Gizmos.color = Color.red;
+       Gizmos.DrawWireSphere(transform.position + transform.forward, ColliderRadius);
+    }
+
     IEnumerator Attack()
     {
         animator.SetBool("isAttacking", true);
         animator.SetInteger("transition", 2);
         yield return new WaitForSeconds(2f);
-        InitiateTransitions(animator.GetBool("isWalking") ? 1 : 0);
+        
+        GetEnemiesRange();
+
+        foreach (Transform enemies in EnemiesList)
+        {
+            //execute attack on enemy
+            EnemyController enemy = enemies.GetComponent<EnemyController>();
+            if (enemy != null)
+            {
+                enemy.GetHit();
+            }
+        }
+        
+        animator.SetInteger("transition", animator.GetBool("isWalking") ? 1 : 0);
+        animator.SetBool("isAttacking", false);
     }
 }
