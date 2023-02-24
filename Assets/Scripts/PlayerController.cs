@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public float Speed = 3f;
 
-    public float RotSpeed = 40f;
+    public float RotSpeed = 80f;
 
     private float Rotation;
 
@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private List<Transform> EnemiesList = new List<Transform>();
 
     public float ColliderRadius;
+    public float PlayerDamage = 25f;
 
     private bool IsReady;
     // Start is called before the first frame update
@@ -57,12 +58,6 @@ public class PlayerController : MonoBehaviour
                     animator.SetInteger("transition", 1);
                     MoveDirection = Vector3.back * Speed;
                     MoveDirection = transform.TransformDirection(MoveDirection);
-                    
-                    //transform.Rotate(Vector3.up * Time.deltaTime * RotSpeed);
-                    
-                    
-                    // Rotation += RotSpeed * Time.deltaTime;
-                    // transform.rotation = Quaternion.Euler(0, Mathf.LerpAngle(transform.rotation.eulerAngles.y, RotSpeed, Rotation), 0);
                 }
                 if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
                 {
@@ -127,25 +122,32 @@ public class PlayerController : MonoBehaviour
        Gizmos.DrawWireSphere(transform.position + transform.forward, ColliderRadius);
     }
 
+    //Validate if the player is ready to attack
     IEnumerator Attack()
     {
-        animator.SetBool("isAttacking", true);
-        animator.SetInteger("transition", 2);
-        yield return new WaitForSeconds(2f);
-        
-        GetEnemiesRange();
-
-        foreach (Transform enemies in EnemiesList)
+        if(!IsReady)
         {
-            //execute attack on enemy
-            EnemyController enemy = enemies.GetComponent<EnemyController>();
-            if (enemy != null)
+            animator.SetBool("isAttacking", true);
+            animator.SetInteger("transition", 2);
+            GetEnemiesRange();
+
+            foreach (Transform enemies in EnemiesList)
             {
-                enemy.GetHit();
+                //execute attack on enemy
+                EnemyController enemy = enemies.GetComponent<EnemyController>();
+                if (enemy != null)
+                {
+                    enemy.GetHit(PlayerDamage);
+                }
             }
+            IsReady = false;
+            yield return new WaitForSeconds(1.9f);
+    
+            animator.SetInteger("transition", animator.GetBool("isWalking") ? 1 : 0);
+            animator.SetBool("isAttacking", false);
+            IsReady = true;
+        }else{
+            IsReady = false;
         }
-        
-        animator.SetInteger("transition", animator.GetBool("isWalking") ? 1 : 0);
-        animator.SetBool("isAttacking", false);
     }
 }
