@@ -15,6 +15,7 @@ public class EnemyController : MonoBehaviour
     public float Gravity = 120f;
     public float lookRadius = 10f;
     public Transform target;
+    public float ColliderRadius;
 
     private float Rotation;
     private CharacterController controller;
@@ -22,7 +23,8 @@ public class EnemyController : MonoBehaviour
     private Vector3 MoveDirection;
     private MeshCollider _meshCollider;
     private NavMeshAgent _navMeshAgent;
-    
+    private bool IsReady;
+    [SerializeField] public bool PlayerIsDead;
     
     // Start is called before the first frame update
     void Start()
@@ -32,6 +34,8 @@ public class EnemyController : MonoBehaviour
         CurrentHealth += TotalHealth;
         _meshCollider = GetComponent<MeshCollider>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        PlayerIsDead = false;
+        ColliderRadius = 1f;
     }
 
     void Update()
@@ -52,22 +56,23 @@ public class EnemyController : MonoBehaviour
                 if (distance <= _navMeshAgent.stoppingDistance)
                 {
                     FaceTarget();
-                    StartCoroutine(Attack());
+                    SetAttack();
                 }
-            }else{
-                animator.SetInteger("transition", 0);
-                animator.SetBool("isWalking", false);
-                animator.SetBool("isAttacking", false);
+                else
+                {
+                    animator.SetBool("isAttacking", false);
+                }
+            }else
+            {
+                StopAnimation();
                 _navMeshAgent.isStopped = true;
             }
         }
         else
         {
-            _navMeshAgent.isStopped = true;
+            animator.SetInteger("transition", 2);
             animator.SetBool("isWalking", false);
             animator.SetBool("isAttacking", false);
-            animator.SetInteger("transition", 2);
-            
         }
     }
 
@@ -90,12 +95,22 @@ public class EnemyController : MonoBehaviour
         DieOrHit();
     }
     
+    private void StopAnimation()
+    {
+        animator.SetInteger("transition", 0);
+        animator.SetBool("isAttacking", false);
+        animator.SetBool("isWalking", false);
+    }
+    
     IEnumerator Attack()
     {
-        animator.SetBool("isAttacking", true);
-        animator.SetBool("isWalking", false);
-        animator.SetInteger("transition", 1);
-        yield return new WaitForSeconds(1f);
+        if (!IsReady)
+        {
+            IsReady = true;
+            yield return new WaitForSeconds(.5f);
+            GetEnemy();
+            IsReady = false;
+        }
     }
 
     IEnumerator RecoveryFromHit()
@@ -119,6 +134,43 @@ public class EnemyController : MonoBehaviour
         {
             animator.SetInteger("transition", 5);
             StartCoroutine(RecoveryFromHit());
+        }
+    }
+
+    
+    //Function to Get Enemy and Deal Damage
+    private void GetEnemy()
+    {
+        foreach (Collider collider in Physics.OverlapSphere((transform.position + transform.forward * ColliderRadius), ColliderRadius))
+        {
+            if (collider.gameObject.CompareTag("Player"))
+            {
+                collider.gameObject.GetComponent<PlayerController>().GetHit(15f);
+                PlayerIsDead = collider.gameObject.GetComponent<PlayerController>().PlayerIsDead;
+            }
+        }
+    }
+
+    
+    //Function to start Attack Animation Event
+    public void AttackAnimationEvent()
+    {
+        StartCoroutine(Attack());
+    }
+
+    //Function to Initiate Attack or Stop Attack if Player is Dead
+    private void SetAttack()
+    {
+        if (PlayerIsDead)
+        {
+            StopAnimation();
+            _navMeshAgent.isStopped = true;
+        }
+        else
+        {
+            animator.SetBool("isAttacking", true);
+            animator.SetBool("isWalking", false);
+            animator.SetInteger("transition", 1);
         }
     }
 }

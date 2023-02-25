@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float Speed = 3f;
+    public float Speed = 4f;
 
     public float RotSpeed = 80f;
 
@@ -25,11 +25,17 @@ public class PlayerController : MonoBehaviour
     public float PlayerDamage = 25f;
 
     private bool IsReady;
+    public float TotalHealth = 100f;
+    public float CurrentHealth;
+    public bool PlayerIsDead;
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+        CurrentHealth += TotalHealth;
+        PlayerIsDead = false;
+        ColliderRadius = 1f;
     }
 
     // Update is called once per frame
@@ -61,13 +67,10 @@ public class PlayerController : MonoBehaviour
                 }
                 if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
                 {
-                    InitiateTransitions();
+                    animator.SetBool("isWalking", false);
+                    animator.SetInteger("transition", 0);
+                    MoveDirection = Vector3.zero;
                 }
-            }
-            else
-            {
-                InitiateTransitions();
-                StartCoroutine(Attack());
             }
         }
         Rotation += Input.GetAxis("Horizontal") * RotSpeed * Time.deltaTime;
@@ -83,25 +86,13 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                if(animator.GetBool("isWalking"))
-                {
-                    InitiateTransitions();
-                }
+                animator.SetBool("isWalking", false);
+                animator.SetInteger("transition", 0);
+                MoveDirection = Vector3.zero;
                 
-                if(!animator.GetBool("isWalking"))
-                {
-                    StartCoroutine(Attack());
-                }
+                SetAttack();
             }
         }
-    }
-
-    private void InitiateTransitions()
-    {
-        animator.SetBool("isWalking", false);
-        animator.SetBool("isAttacking", false);
-        animator.SetInteger("transition", 0);
-        MoveDirection = Vector3.zero;
     }
 
     private void GetEnemiesRange()
@@ -127,27 +118,72 @@ public class PlayerController : MonoBehaviour
     {
         if(!IsReady)
         {
-            animator.SetBool("isAttacking", true);
-            animator.SetInteger("transition", 2);
+            IsReady = true;
+            yield return new WaitForSeconds(1f);
             GetEnemiesRange();
-
             foreach (Transform enemies in EnemiesList)
             {
-                //execute attack on enemy
                 EnemyController enemy = enemies.GetComponent<EnemyController>();
                 if (enemy != null)
                 {
                     enemy.GetHit(PlayerDamage);
                 }
             }
-            IsReady = false;
-            yield return new WaitForSeconds(1.9f);
-    
             animator.SetInteger("transition", animator.GetBool("isWalking") ? 1 : 0);
             animator.SetBool("isAttacking", false);
-            IsReady = true;
-        }else{
             IsReady = false;
         }
+    }
+    
+    IEnumerator RecoveryFromHit() 
+    {
+        yield return new WaitForSeconds(1f);
+        animator.SetInteger("transition", 0);
+    }
+    
+    public void GetHit(float Damage) 
+    {
+        CurrentHealth -= Damage;
+        DieOrHit();
+        PlayerIsDead = animator.GetBool("isDead");
+    }
+
+    void DieOrHit() 
+    {
+        if (CurrentHealth <= 0)
+        {
+            animator.SetBool("isAttacking", false);
+            animator.SetBool("isWalking", false);
+            animator.SetBool("isDead", true);
+            animator.SetInteger("transition", 4);
+        }
+        else
+        {
+            SetRecovery();
+        }
+    }
+    
+    //Function to Initiate Attack or Stop Attack if Player is Dead
+    private void SetAttack()
+    {
+        animator.SetInteger("transition", 2);
+        animator.SetBool("isAttacking", true);
+        animator.SetBool("isWalking", false);
+    }
+
+    private void SetRecovery()
+    {
+        animator.SetInteger("transition", 3);
+    }
+    
+    
+    //Function to start Attack Animation Event
+    public void AttackAnimationEvent() 
+    {
+        StartCoroutine(Attack());
+    }
+    public void RecoveryHitAnimationEvent()
+    {
+        StartCoroutine(RecoveryFromHit());
     }
 }
