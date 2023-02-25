@@ -107,7 +107,7 @@ public class EnemyController : MonoBehaviour
         if (!IsReady)
         {
             IsReady = true;
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(2f);
             GetEnemy();
             IsReady = false;
         }
@@ -115,7 +115,7 @@ public class EnemyController : MonoBehaviour
 
     IEnumerator RecoveryFromHit()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(5f);
         animator.SetInteger("transition", 0);
     }
 
@@ -132,8 +132,11 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            animator.SetInteger("transition", 5);
-            StartCoroutine(RecoveryFromHit());
+            animator.SetInteger("transition", 0);
+            animator.SetBool("isAttacking", false);
+            animator.SetBool("isWalking", false);
+            transform.position -= Vector3.back * 1f;
+            RecoveryHitAnimationEvent();
         }
     }
 
@@ -157,6 +160,10 @@ public class EnemyController : MonoBehaviour
     {
         StartCoroutine(Attack());
     }
+    public void RecoveryHitAnimationEvent()
+    {
+        StartCoroutine(RecoveryFromHit());
+    }
 
     //Function to Initiate Attack or Stop Attack if Player is Dead
     private void SetAttack()
@@ -168,9 +175,9 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
+            animator.SetInteger("transition", 1);
             animator.SetBool("isAttacking", true);
             animator.SetBool("isWalking", false);
-            animator.SetInteger("transition", 1);
         }
     }
 }

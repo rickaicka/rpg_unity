@@ -577,6 +577,10 @@ MonoBehaviour:
   Speed: 3
   RotSpeed: 40
   Gravity: 120
+  lookRadius: 10
+  target: {fileID: 0}
+  ColliderRadius: 1
+  PlayerIsDead: 0
 --- !u!195 &1148496287735486432
 NavMeshAgent:
   m_ObjectHideFlags: 0

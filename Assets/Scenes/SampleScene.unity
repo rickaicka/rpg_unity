@@ -2179,7 +2179,7 @@ PrefabInstance:
     - target: {fileID: 1148496287735486432, guid: bf5f09998e2b6464b8cb6a5222cc4a5c,
         type: 3}
       propertyPath: m_Speed
-      value: 2.15
+      value: 1.9
       objectReference: {fileID: 0}
     - target: {fileID: 1148496287735486432, guid: bf5f09998e2b6464b8cb6a5222cc4a5c,
         type: 3}
@@ -2583,7 +2583,7 @@ PrefabInstance:
     - target: {fileID: 1906340845839264279, guid: d7d2277343ec269419e29f3c827c95a6,
         type: 3}
       propertyPath: ColliderRadius
-      value: 0.8
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1906340845839264281, guid: d7d2277343ec269419e29f3c827c95a6,
         type: 3}
