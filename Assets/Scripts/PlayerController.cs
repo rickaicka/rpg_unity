@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     public float PlayerDamage = 25f;
 
     private bool IsReady;
-    public float TotalHealth = 100f;
+    public float TotalHealth = 10000f;
     public float CurrentHealth;
     public bool PlayerIsDead;
     // Start is called before the first frame update
@@ -137,7 +137,7 @@ public class PlayerController : MonoBehaviour
     
     IEnumerator RecoveryFromHit() 
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(.5f);
         animator.SetInteger("transition", 0);
     }
     
@@ -150,10 +150,10 @@ public class PlayerController : MonoBehaviour
 
     void DieOrHit() 
     {
+        animator.SetBool("isAttacking", false);
+        animator.SetBool("isWalking", false);
         if (CurrentHealth <= 0)
         {
-            animator.SetBool("isAttacking", false);
-            animator.SetBool("isWalking", false);
             animator.SetBool("isDead", true);
             animator.SetInteger("transition", 4);
         }

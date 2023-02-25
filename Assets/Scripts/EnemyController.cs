@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
-    public float TotalHealth = 100f;
+    public float TotalHealth = 10000f;
     public float CurrentHealth = 0;
     public float AttackDamage;
     public float MovementSpeed;
@@ -107,7 +107,7 @@ public class EnemyController : MonoBehaviour
         if (!IsReady)
         {
             IsReady = true;
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(.9f);
             GetEnemy();
             IsReady = false;
         }
@@ -115,7 +115,7 @@ public class EnemyController : MonoBehaviour
 
     IEnumerator RecoveryFromHit()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
         animator.SetInteger("transition", 0);
     }
 
@@ -132,11 +132,9 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            animator.SetInteger("transition", 0);
+            animator.SetInteger("transition", 5);
             animator.SetBool("isAttacking", false);
             animator.SetBool("isWalking", false);
-            transform.position -= Vector3.back * 1f;
-            RecoveryHitAnimationEvent();
         }
     }
 
