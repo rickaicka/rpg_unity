@@ -11410,6 +11410,10 @@ MonoBehaviour:
   RotSpeed: 40
   Gravity: 120
   ColliderRadius: 0
+  PlayerDamage: 25
+  TotalHealth: 100
+  CurrentHealth: 0
+  PlayerIsDead: 0
 --- !u!1 &1905190859736550037
 GameObject:
   m_ObjectHideFlags: 0

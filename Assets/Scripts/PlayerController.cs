@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     public float PlayerDamage = 25f;
 
     private bool IsReady;
-    public float TotalHealth = 10000f;
+    public float TotalHealth = 100f;
     public float CurrentHealth;
     public bool PlayerIsDead;
     // Start is called before the first frame update
