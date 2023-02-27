@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 610073cada422fc4b9230bb623f3458d, type: 3}
   m_Name: Armor
   m_EditorClassIdentifier: 
-  icon: {fileID: 0}
-  itemName: Potion
-  itemValue: 5
-  itemType: 0
+  itemImage: {fileID: 21300000, guid: 59c34340395de18469a1434dc5bb508b, type: 3}
+  itemName: Armor
+  itemValue: 50
+  itemType: 1
+  slotType: 2

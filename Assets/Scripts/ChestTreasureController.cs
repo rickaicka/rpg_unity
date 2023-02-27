@@ -10,6 +10,7 @@ public class ChestTreasureController : MonoBehaviour
     public float ColliderRadius;
 
     public bool IsOpened;
+    public List<ItemsController> items = new List<ItemsController>();
     // Start is called before the first frame update
     void Start()
     {
@@ -25,13 +26,16 @@ public class ChestTreasureController : MonoBehaviour
 
     void GetPlayer()
     {
-        foreach (Collider collider in Physics.OverlapSphere((transform.localPosition - transform.forward * ColliderRadius), ColliderRadius))
+        if (!IsOpened)
         {
-            if (collider.gameObject.CompareTag("Player"))
+            foreach (Collider collider in Physics.OverlapSphere((transform.localPosition - transform.forward * ColliderRadius), ColliderRadius))
             {
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (collider.gameObject.CompareTag("Player"))
                 {
-                    OpenChest(); 
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        OpenChest(); 
+                    }
                 }
             }
         }
@@ -46,6 +50,10 @@ public class ChestTreasureController : MonoBehaviour
 
     void OpenChest()
     {
+        foreach (ItemsController item in items)
+        {
+            item.GetAction();
+        }
         IsOpened = true;
         _animator.SetTrigger("isOpened");
     }

@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
     {
         if (controller.isGrounded)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.Z))
             {
                 animator.SetBool("isWalking", false);
                 animator.SetInteger("transition", 0);

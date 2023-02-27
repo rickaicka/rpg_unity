@@ -4,30 +4,42 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Items", menuName = "Inventory/Items", order = 0)]
 public class ItemsController : ScriptableObject
 {
-    public Sprite icon;
+    public Sprite itemImage;
     public string itemName;
     public float itemValue;
     [System.Serializable]
-    public enum TypeItem    
+    public enum TypeItemEnum    
     {
-        Potion,
         Weapon,
         Armor,
+        Consumable
     }
-    public TypeItem itemType;
+    [System.Serializable]
+    public enum TypeSlotsEnum    
+    {
+        Inventory,
+        Helmet,
+        Armor,
+        Sword,
+        Shield,
+        Boots,
+        Consumable
+    }
+    public TypeItemEnum itemType;
+    public TypeSlotsEnum slotType;
     
-    public void GetItem()
+    public void GetAction()
     {
         switch (itemType)
         {
-            case TypeItem.Potion:
-                Debug.Log("Potion");
-                break;
-            case TypeItem.Weapon:
+            case TypeItemEnum.Weapon:
                 Debug.Log("Weapon");
                 break;
-            case TypeItem.Armor:
+            case TypeItemEnum.Armor:
                 Debug.Log("Armor");
+                break;
+            case TypeItemEnum.Consumable:
+                Debug.Log("Consumable");
                 break;
         }
     }
