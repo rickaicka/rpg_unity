@@ -1,7 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -25,9 +29,12 @@ public class PlayerController : MonoBehaviour
     public float PlayerDamage = 25f;
 
     private bool IsReady;
-    public float TotalHealth = 100f;
+    public float TotalHealth = 1000f;
     public float CurrentHealth;
     public bool PlayerIsDead;
+    
+    public Slider healthBar;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -41,8 +48,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        MovePlayer();
-        GetMouseInput();
+        if(EventSystem.current.currentSelectedGameObject == null)
+        {
+            MovePlayer();
+            GetMouseInput();
+        }
     }
 
     private void MovePlayer()
@@ -84,7 +94,7 @@ public class PlayerController : MonoBehaviour
     {
         if (controller.isGrounded)
         {
-            if (Input.GetKeyDown(KeyCode.Z))
+            if (Input.GetMouseButtonDown(0))
             {
                 animator.SetBool("isWalking", false);
                 animator.SetInteger("transition", 0);
@@ -144,6 +154,7 @@ public class PlayerController : MonoBehaviour
     public void GetHit(float Damage) 
     {
         CurrentHealth -= Damage;
+        healthBar.value = CurrentHealth;
         DieOrHit();
         PlayerIsDead = animator.GetBool("isDead");
     }
@@ -185,5 +196,16 @@ public class PlayerController : MonoBehaviour
     public void RecoveryHitAnimationEvent()
     {
         StartCoroutine(RecoveryFromHit());
+    }
+
+    public void IncreaseStats(float health, float damage)
+    {
+        CurrentHealth += health;
+        PlayerDamage += damage;
+    }
+    public void DecreaseStats(float health, float damage)
+    {
+        CurrentHealth -= health;
+        PlayerDamage -= damage;
     }
 }

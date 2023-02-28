@@ -11,6 +11,8 @@ public class DragIItemController : MonoBehaviour, IBeginDragHandler, IDragHandle
     private Vector3 startPosition;
     private Transform startParent;
     public ItemsController item;
+    
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -44,11 +46,14 @@ public class DragIItemController : MonoBehaviour, IBeginDragHandler, IDragHandle
     {
         if ((int)slot.slotType == (int)item.slotType)
         {
+            //equip item
             transform.SetParent(slotTransform);
             item.GetAction();
         }else if (slot.slotType == SlotsController.TypeSlotsEnum.Inventory)
         {
+            //remove equiped item
             transform.SetParent(slotTransform);
+            item.RemoveAction();
         }
         else
         {

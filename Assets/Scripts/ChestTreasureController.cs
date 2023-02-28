@@ -52,7 +52,8 @@ public class ChestTreasureController : MonoBehaviour
     {
         foreach (ItemsController item in items)
         {
-            item.GetAction();
+            //item.GetAction();
+            InventoryController.Instance.CreateItem(item);
         }
         IsOpened = true;
         _animator.SetTrigger("isOpened");

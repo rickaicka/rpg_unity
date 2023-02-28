@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class EnemyController : MonoBehaviour
 {
@@ -25,6 +27,12 @@ public class EnemyController : MonoBehaviour
     private NavMeshAgent _navMeshAgent;
     private bool IsReady;
     [SerializeField] public bool PlayerIsDead;
+
+    public Slider healthBar;
+    
+    [Header("Path")]
+    public List<Transform> PathPoints = new List<Transform>();
+    public int CurrentPoint = 0;
     
     // Start is called before the first frame update
     void Start()
@@ -36,6 +44,21 @@ public class EnemyController : MonoBehaviour
         _navMeshAgent = GetComponent<NavMeshAgent>();
         PlayerIsDead = false;
         ColliderRadius = 1f;
+    }
+
+    void MoveToNextPoint()
+    {
+        if (PathPoints.Count > 0)
+        {
+            float distance = Vector3.Distance(PathPoints[CurrentPoint].position, transform.position);
+            _navMeshAgent.destination = PathPoints[CurrentPoint].position;
+            
+            if(distance <= _navMeshAgent.stoppingDistance)
+            {
+                CurrentPoint = Random.Range(0, PathPoints.Count);
+                CurrentPoint %= PathPoints.Count;
+            }
+        }
     }
 
     void Update()
@@ -64,8 +87,12 @@ public class EnemyController : MonoBehaviour
                 }
             }else
             {
-                StopAnimation();
-                _navMeshAgent.isStopped = true;
+                //StopAnimation();
+                //_navMeshAgent.isStopped = true;
+                
+                animator.SetInteger("transition", 3);
+                animator.SetBool("isWalking", true);
+                MoveToNextPoint();
             }
         }
         else
@@ -92,6 +119,7 @@ public class EnemyController : MonoBehaviour
     public void GetHit(float Damage)
     {
         CurrentHealth -= Damage;
+        healthBar.value = CurrentHealth / TotalHealth;
         DieOrHit();
     }
     

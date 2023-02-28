@@ -28,18 +28,39 @@ public class ItemsController : ScriptableObject
     public TypeItemEnum itemType;
     public TypeSlotsEnum slotType;
     
+    public PlayerController player;
+    
     public void GetAction()
     {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        
         switch (itemType)
         {
             case TypeItemEnum.Weapon:
-                Debug.Log("Weapon");
+                player.IncreaseStats(0, itemValue);
                 break;
             case TypeItemEnum.Armor:
-                Debug.Log("Armor");
+                player.IncreaseStats(itemValue, itemValue / .25f);
                 break;
             case TypeItemEnum.Consumable:
-                Debug.Log("Consumable");
+                player.IncreaseStats(itemValue, 0f);
+                break;
+        }
+    }
+    public void RemoveAction()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        
+        switch (itemType)
+        {
+            case TypeItemEnum.Weapon:
+                player.DecreaseStats(0, itemValue);
+                break;
+            case TypeItemEnum.Armor:
+                player.DecreaseStats(itemValue, itemValue / .25f);
+                break;
+            case TypeItemEnum.Consumable:
+                player.DecreaseStats(itemValue, 0f);
                 break;
         }
     }
